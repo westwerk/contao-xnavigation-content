@@ -1,0 +1,57 @@
+{
+	"name": "bit3/contao-xnavigation-content",
+	"description": "Content based navigation for the xNavigation extension.",
+	"keywords": ["contao", "navigation", "sitemap"],
+	"type": "contao-module",
+	"homepage": "http://bit3.de",
+	"license": "LGPL-3.0+",
+	"authors": [
+		{
+			"name": "Tristan Lins",
+			"email": "tristan.lins@bit3.de",
+			"homepage": "http://bit3.de",
+			"role": "Developer"
+		}
+	],
+	"support": {
+		"email": "info@bit3.de",
+		"issues": "https://github.com/bit3/contao-xnavigation-content/issues",
+		"wiki": "https://github.com/bit3/contao-xnavigation-content/wiki",
+		"irc": "irc://irc.freenode.org/contao.dev",
+		"source": "https://github.com/bit3/contao-xnavigation-content"
+	},
+	"require": {
+		"php": ">=5.3",
+		"contao/core": ">=3.2.1,<3.4-dev",
+		"contao-community-alliance/composer-plugin": "~2.0",
+		"contao-community-alliance/event-dispatcher": "~1.0",
+		"contao-community-alliance/events-create-options": "~1.0",
+		"bit3/contao-xnavigation": "~2.0",
+		"bit3/contao-meta-palettes": "~1.0",
+		"bit3/contao-twig": ">=1.7,<2-dev"
+	},
+	"require-dev": {
+		"bit3/php-coding-standard": "@dev"
+	},
+	"autoload": {
+		"psr-0": {
+			"Bit3\\Contao\\XNavigation\\Content": "src/"
+		}
+	},
+	"extra": {
+		"contao": {
+			"sources": {
+				"module": "system/modules/xnavigation-content"
+			},
+			"transifex": {
+				"project": "contao-xnavigation-content",
+				"prefix": "xnavigation-",
+				"languages_cto": "contao/languages",
+				"languages_tx": ".tx"
+			}
+		},
+		"branch-alias": {
+			"dev-develop": "1.0.x-dev"
+		}
+	}
+}
