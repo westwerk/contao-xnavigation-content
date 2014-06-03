@@ -56,6 +56,8 @@ class ContentProvider implements EventSubscriberInterface
 			if ($contents) {
 				$factory = $event->getFactory();
 
+				$reachedLevel = 7;
+
 				foreach ($contents as $content) {
 					$headline = deserialize($content->headline, true);
 					$cssID    = deserialize($content->cssID, true);
@@ -63,10 +65,15 @@ class ContentProvider implements EventSubscriberInterface
 					if (
 						!empty($headline['value']) &&
 						!empty($headline['unit']) &&
-						$headline['unit'] == 'h1' &&
 						!empty($cssID[0])
 					) {
-						$factory->createItem('content', $content->id, $item);
+						$elementLevel = (int) substr($headline['unit'], 1);
+
+						if ($elementLevel <= $reachedLevel) {
+							$factory->createItem('content', $content->id, $item);
+
+							$reachedLevel = $elementLevel;
+						}
 					}
 				}
 			}
