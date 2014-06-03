@@ -82,9 +82,7 @@ class ContentProvider implements EventSubscriberInterface
 		else if ($item->getType() == 'content') {
 			$thisHeadline = deserialize($item->getExtra('headline'), true);
 
-			if (
-			!empty($thisHeadline['unit'])
-			) {
+			if (!empty($thisHeadline['unit'])) {
 				$expectedLevel = intval(substr($thisHeadline['unit'], 1)) + 1;
 
 				$t          = \ContentModel::getTable();
