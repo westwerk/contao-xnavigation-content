@@ -13,6 +13,7 @@
 
 namespace Bit3\Contao\XNavigation\Content\Provider;
 
+use Bit3\Contao\XNavigation\XNavigationEvents;
 use Bit3\FlexiTree\Event\CollectItemsEvent;
 use Bit3\FlexiTree\Event\CreateItemEvent;
 use Contao\PageModel;
@@ -29,8 +30,8 @@ class ContentProvider implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			'create-item'   => 'createItem',
-			'collect-items' => array('collectItems', 100),
+			XNavigationEvents::CREATE_ITEM   => 'createItem',
+			XNavigationEvents::COLLECT_ITEMS => array('collectItems', 100),
 		);
 	}
 
@@ -56,6 +57,8 @@ class ContentProvider implements EventSubscriberInterface
 			if ($contents) {
 				$factory = $event->getFactory();
 
+				$reachedLevel = 7;
+
 				foreach ($contents as $content) {
 					$headline = deserialize($content->headline, true);
 					$cssID    = deserialize($content->cssID, true);
@@ -63,10 +66,15 @@ class ContentProvider implements EventSubscriberInterface
 					if (
 						!empty($headline['value']) &&
 						!empty($headline['unit']) &&
-						$headline['unit'] == 'h1' &&
 						!empty($cssID[0])
 					) {
-						$factory->createItem('content', $content->id, $item);
+						$elementLevel = (int) substr($headline['unit'], 1);
+
+						if ($elementLevel <= $reachedLevel) {
+							$factory->createItem('content', $content->id, $item);
+
+							$reachedLevel = $elementLevel;
+						}
 					}
 				}
 			}
@@ -75,9 +83,7 @@ class ContentProvider implements EventSubscriberInterface
 		else if ($item->getType() == 'content') {
 			$thisHeadline = deserialize($item->getExtra('headline'), true);
 
-			if (
-			!empty($thisHeadline['unit'])
-			) {
+			if (!empty($thisHeadline['unit'])) {
 				$expectedLevel = intval(substr($thisHeadline['unit'], 1)) + 1;
 
 				$t          = \ContentModel::getTable();
