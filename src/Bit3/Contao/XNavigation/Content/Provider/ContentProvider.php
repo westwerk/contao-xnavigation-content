@@ -13,6 +13,7 @@
 
 namespace Bit3\Contao\XNavigation\Content\Provider;
 
+use Bit3\Contao\XNavigation\XNavigationEvents;
 use Bit3\FlexiTree\Event\CollectItemsEvent;
 use Bit3\FlexiTree\Event\CreateItemEvent;
 use Contao\PageModel;
@@ -29,8 +30,8 @@ class ContentProvider implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
-			'create-item'   => 'createItem',
-			'collect-items' => array('collectItems', 100),
+			XNavigationEvents::CREATE_ITEM   => 'createItem',
+			XNavigationEvents::COLLECT_ITEMS => array('collectItems', 100),
 		);
 	}
 
