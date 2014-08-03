@@ -24,160 +24,158 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ContentProvider implements EventSubscriberInterface
 {
-	/**
+    /**
 	 * {@inheritdoc}
 	 */
-	public static function getSubscribedEvents()
-	{
-		return array(
-			XNavigationEvents::CREATE_ITEM   => 'createItem',
-			XNavigationEvents::COLLECT_ITEMS => array('collectItems', 100),
-		);
-	}
+    public static function getSubscribedEvents()
+    {
+        return array(
+            XNavigationEvents::CREATE_ITEM   => 'createItem',
+            XNavigationEvents::COLLECT_ITEMS => array('collectItems', 100),
+        );
+    }
 
-	public function collectItems(CollectItemsEvent $event)
-	{
-		$item = $event->getParentItem();
+    public function collectItems(CollectItemsEvent $event)
+    {
+        $item = $event->getParentItem();
 
-		if ($item->getType() == 'article') {
-			$t          = \ContentModel::getTable();
-			$arrColumns = array("$t.pid=?", "($t.ptable='' OR $t.ptable='tl_article')", "$t.cssID!=''");
+        if ($item->getType() == 'article') {
+            $t          = \ContentModel::getTable();
+            $arrColumns = array("$t.pid=?", "($t.ptable='' OR $t.ptable='tl_article')", "$t.cssID!=''");
 
-			if (!BE_USER_LOGGED_IN) {
-				$time         = time();
-				$arrColumns[] = "($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.invisible=''";
-			}
+            if (!BE_USER_LOGGED_IN) {
+                $time         = time();
+                $arrColumns[] = "($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.invisible=''";
+            }
 
-			$contents = \ContentModel::findBy(
-				$arrColumns,
-				array($item->getName()),
-				array('order' => 'sorting')
-			);
+            $contents = \ContentModel::findBy(
+                $arrColumns,
+                array($item->getName()),
+                array('order' => 'sorting')
+            );
 
-			if ($contents) {
-				$factory = $event->getFactory();
+            if ($contents) {
+                $factory = $event->getFactory();
 
-				$reachedLevel = 7;
+                $reachedLevel = 7;
 
-				foreach ($contents as $content) {
-					$headline = deserialize($content->headline, true);
-					$cssID    = deserialize($content->cssID, true);
+                foreach ($contents as $content) {
+                    $headline = deserialize($content->headline, true);
+                    $cssID    = deserialize($content->cssID, true);
 
-					if (
-						!empty($headline['value']) &&
-						!empty($headline['unit']) &&
-						!empty($cssID[0])
-					) {
-						$elementLevel = (int) substr($headline['unit'], 1);
+                    if (
+                        !empty($headline['value']) &&
+                        !empty($headline['unit']) &&
+                        !empty($cssID[0])
+                    ) {
+                        $elementLevel = (int) substr($headline['unit'], 1);
 
-						if ($elementLevel <= $reachedLevel) {
-							$factory->createItem('content', $content->id, $item);
+                        if ($elementLevel <= $reachedLevel) {
+                            $factory->createItem('content', $content->id, $item);
 
-							$reachedLevel = $elementLevel;
-						}
-					}
-				}
-			}
-		}
+                            $reachedLevel = $elementLevel;
+                        }
+                    }
+                }
+            }
+        } elseif ($item->getType() == 'content') {
+            $thisHeadline = deserialize($item->getExtra('headline'), true);
 
-		else if ($item->getType() == 'content') {
-			$thisHeadline = deserialize($item->getExtra('headline'), true);
+            if (!empty($thisHeadline['unit'])) {
+                $expectedLevel = intval(substr($thisHeadline['unit'], 1)) + 1;
 
-			if (!empty($thisHeadline['unit'])) {
-				$expectedLevel = intval(substr($thisHeadline['unit'], 1)) + 1;
+                $t          = \ContentModel::getTable();
+                $arrColumns = array(
+                    "$t.pid=?",
+                    "($t.ptable='' OR $t.ptable='tl_article')",
+                    "$t.cssID!=''",
+                    "$t.sorting > ?"
+                );
 
-				$t          = \ContentModel::getTable();
-				$arrColumns = array(
-					"$t.pid=?",
-					"($t.ptable='' OR $t.ptable='tl_article')",
-					"$t.cssID!=''",
-					"$t.sorting > ?"
-				);
+                if (!BE_USER_LOGGED_IN) {
+                    $time         = time();
+                    $arrColumns[] = "($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.invisible=''";
+                }
 
-				if (!BE_USER_LOGGED_IN) {
-					$time         = time();
-					$arrColumns[] = "($t.start='' OR $t.start<$time) AND ($t.stop='' OR $t.stop>$time) AND $t.invisible=''";
-				}
+                $contents = \ContentModel::findBy(
+                    $arrColumns,
+                    array($item->getExtra('pid'), $item->getExtra('sorting')),
+                    array('order' => 'sorting')
+                );
 
-				$contents = \ContentModel::findBy(
-					$arrColumns,
-					array($item->getExtra('pid'), $item->getExtra('sorting')),
-					array('order' => 'sorting')
-				);
+                if ($contents) {
+                    $factory = $event->getFactory();
 
-				if ($contents) {
-					$factory = $event->getFactory();
+                    $reachedLevel = 7;
 
-					$reachedLevel = 7;
+                    foreach ($contents as $content) {
+                        $headline = deserialize($content->headline, true);
+                        $cssID    = deserialize($content->cssID, true);
 
-					foreach ($contents as $content) {
-						$headline = deserialize($content->headline, true);
-						$cssID    = deserialize($content->cssID, true);
+                        if (
+                            !empty($headline['value']) &&
+                            !empty($headline['unit']) &&
+                            !empty($cssID[0])
+                        ) {
+                            $elementLevel = (int) substr($headline['unit'], 1);
 
-						if (
-							!empty($headline['value']) &&
-							!empty($headline['unit']) &&
-							!empty($cssID[0])
-						) {
-							$elementLevel = (int) substr($headline['unit'], 1);
+                            // level is one down
+                            if ($elementLevel >= $expectedLevel && $elementLevel <= $reachedLevel) {
+                                $factory->createItem('content', $content->id, $item);
 
-							// level is one down
-							if ($elementLevel >= $expectedLevel && $elementLevel <= $reachedLevel) {
-								$factory->createItem('content', $content->id, $item);
+                                $reachedLevel = $elementLevel;
+                            }
+                            // level goes up
+                            else if ($elementLevel < $expectedLevel) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-								$reachedLevel = $elementLevel;
-							}
-							// level goes up
-							else if ($elementLevel < $expectedLevel) {
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    public function createItem(CreateItemEvent $event)
+    {
+        $item = $event->getItem();
 
-	public function createItem(CreateItemEvent $event)
-	{
-		$item = $event->getItem();
+        if ($item->getType() == 'content') {
+            $content = \ContentModel::findByPk($item->getName());
 
-		if ($item->getType() == 'content') {
-			$content = \ContentModel::findByPk($item->getName());
+            if ($content && ($content->ptable == '' || $content->ptable == 'tl_article')) {
+                $article = \ArticleModel::findByPk($content->pid);
 
-			if ($content && ($content->ptable == '' || $content->ptable == 'tl_article')) {
-				$article = \ArticleModel::findByPk($content->pid);
+                if ($article) {
+                    $page = \PageModel::findByPk($article->pid);
 
-				if ($article) {
-					$page = \PageModel::findByPk($article->pid);
+                    if ($page) {
+                        $headline = deserialize($content->headline, true);
+                        $cssID    = deserialize($content->cssID, true);
 
-					if ($page) {
-						$headline = deserialize($content->headline, true);
-						$cssID    = deserialize($content->cssID, true);
+                        if (
+                            !empty($headline['value']) &&
+                            !empty($headline['unit']) &&
+                            !empty($cssID[0])
+                        ) {
+                            $item->setUri(\Frontend::generateFrontendUrl($page->row()) . '#' . $cssID[0]);
+                            $item->setLabel($headline['value']);
 
-						if (
-							!empty($headline['value']) &&
-							!empty($headline['unit']) &&
-							!empty($cssID[0])
-						) {
-							$item->setUri(\Frontend::generateFrontendUrl($page->row()) . '#' . $cssID[0]);
-							$item->setLabel($headline['value']);
+                            $item->setExtras($content->row());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-							$item->setExtras($content->row());
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
+    /**
 	 * @SuppressWarnings(PHPMD.Superglobals)
 	 * @SuppressWarnings(PHPMD.CamelCaseVariableName)
 	 * @return \PageModel
 	 */
-	protected function getCurrentPage()
-	{
-		return $GLOBALS['objPage'];
-	}
+    protected function getCurrentPage()
+    {
+        return $GLOBALS['objPage'];
+    }
 }

@@ -21,27 +21,28 @@ use Bit3\FlexiTree\ItemInterface;
  */
 class ContentPublishedCondition implements ConditionInterface
 {
-	/**
+    /**
 	 * {@inheritdoc}
 	 */
-	public function matchItem(ItemInterface $item)
-	{
-		if ($item->getType() != 'content') {
-			return true;
-		}
+    public function matchItem(ItemInterface $item)
+    {
+        if ($item->getType() != 'content') {
+            return true;
+        }
 
-		$invisible = $item->getExtra('invisible');
-		$start     = $item->getExtra('start');
-		$stop      = $item->getExtra('stop');
-		$time      = time();
-		return !$invisible && (!$start || $start <= $time) && (!$stop || $stop >= $time);
-	}
+        $invisible = $item->getExtra('invisible');
+        $start     = $item->getExtra('start');
+        $stop      = $item->getExtra('stop');
+        $time      = time();
 
-	/**
+        return !$invisible && (!$start || $start <= $time) && (!$stop || $stop >= $time);
+    }
+
+    /**
 	 * {@inheritdoc}
 	 */
-	public function describe()
-	{
-		return 'content.published';
-	}
+    public function describe()
+    {
+        return 'content.published';
+    }
 }

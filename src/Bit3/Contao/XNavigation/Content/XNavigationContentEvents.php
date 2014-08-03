@@ -13,10 +13,6 @@
 
 namespace Bit3\Contao\XNavigation\Content;
 
-use Bit3\Contao\XNavigation\Event\EvaluateRootEvent;
-use Bit3\Contao\XNavigation\Twig\TwigExtension;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 /**
  * Class XNavigationContentEvents
  */

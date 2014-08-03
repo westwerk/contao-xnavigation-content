@@ -22,52 +22,54 @@ use Bit3\FlexiTree\ItemInterface;
 class ContentProtectedCondition implements ConditionInterface
 {
 
-	/**
+    /**
 	 * @var bool
 	 */
-	protected $acceptedProtectedStatus;
+    protected $acceptedProtectedStatus;
 
-	function __construct($acceptedProtectedStatus = false)
-	{
-		$this->acceptedProtectedStatus = $acceptedProtectedStatus;
-	}
+    public function __construct($acceptedProtectedStatus = false)
+    {
+        $this->acceptedProtectedStatus = $acceptedProtectedStatus;
+    }
 
-	/**
+    /**
 	 * @param boolean $acceptedProtectedStatus
 	 */
-	public function setAcceptedProtectedStatus($acceptedProtectedStatus)
-	{
-		$this->acceptedProtectedStatus = $acceptedProtectedStatus;
-		return $this;
-	}
+    public function setAcceptedProtectedStatus($acceptedProtectedStatus)
+    {
+        $this->acceptedProtectedStatus = $acceptedProtectedStatus;
 
-	/**
+        return $this;
+    }
+
+    /**
 	 * @SuppressWarnings(PHPMD.BooleanGetMethodName)
 	 * @return boolean
 	 */
-	public function getAcceptedProtectedStatus()
-	{
-		return $this->acceptedProtectedStatus;
-	}
+    public function getAcceptedProtectedStatus()
+    {
+        return $this->acceptedProtectedStatus;
+    }
 
-	/**
+    /**
 	 * {@inheritdoc}
 	 */
-	public function matchItem(ItemInterface $item)
-	{
-		if ($item->getType() != 'content') {
-			return true;
-		}
+    public function matchItem(ItemInterface $item)
+    {
+        if ($item->getType() != 'content') {
+            return true;
+        }
 
-		$protected = $item->getExtra('protected');
-		return $protected == $this->acceptedProtectedStatus;
-	}
+        $protected = $item->getExtra('protected');
 
-	/**
+        return $protected == $this->acceptedProtectedStatus;
+    }
+
+    /**
 	 * {@inheritdoc}
 	 */
-	public function describe()
-	{
-		return $this->acceptedProtectedStatus ? 'content.protected' : '!content.protected';
-	}
+    public function describe()
+    {
+        return $this->acceptedProtectedStatus ? 'content.protected' : '!content.protected';
+    }
 }

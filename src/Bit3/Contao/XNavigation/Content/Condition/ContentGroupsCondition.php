@@ -21,31 +21,32 @@ use Bit3\FlexiTree\ItemInterface;
  */
 class ContentGroupsCondition implements ConditionInterface
 {
-	/**
+    /**
 	 * {@inheritdoc}
 	 */
-	public function matchItem(ItemInterface $item)
-	{
-		if ($item->getType() != 'content') {
-			return true;
-		}
+    public function matchItem(ItemInterface $item)
+    {
+        if ($item->getType() != 'content') {
+            return true;
+        }
 
-		if (!FE_USER_LOGGED_IN) {
-			return false;
-		}
+        if (!FE_USER_LOGGED_IN) {
+            return false;
+        }
 
-		$contentGroups = $item->getExtra('groups');
-		$memberGroups  = \FrontendUser::getInstance()->groups;
+        $contentGroups = $item->getExtra('groups');
+        $memberGroups  = \FrontendUser::getInstance()->groups;
 
-		$groups = array_intersect($memberGroups, $contentGroups);
-		return (bool) count($groups);
-	}
+        $groups = array_intersect($memberGroups, $contentGroups);
 
-	/**
+        return (bool) count($groups);
+    }
+
+    /**
 	 * {@inheritdoc}
 	 */
-	public function describe()
-	{
-		return 'member.groups ⊂ content.groups';
-	}
+    public function describe()
+    {
+        return 'member.groups ⊂ content.groups';
+    }
 }
