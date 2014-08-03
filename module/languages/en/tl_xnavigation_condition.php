@@ -11,17 +11,16 @@
  * @license    http://www.gnu.org/licenses/lgpl-3.0.html LGPL
  */
 
-
 /**
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_xnavigation_condition']['content_guests_accepted_guests_status']     = array(
-	'Accepted status',
-	'Please choose the accepted status of the "guests only" flag.'
+    'Accepted status',
+    'Please choose the accepted status of the "guests only" flag.'
 );
 $GLOBALS['TL_LANG']['tl_xnavigation_condition']['content_members_accepted_protected_status'] = array(
-	'Accepted status',
-	'Please choose the accepted status of the "protected" flag.'
+    'Accepted status',
+    'Please choose the accepted status of the "protected" flag.'
 );
 
 /**

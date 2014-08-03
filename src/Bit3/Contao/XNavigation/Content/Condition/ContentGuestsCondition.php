@@ -22,52 +22,54 @@ use Bit3\FlexiTree\ItemInterface;
 class ContentGuestsCondition implements ConditionInterface
 {
 
-	/**
+    /**
 	 * @var bool
 	 */
-	protected $acceptedGuestsStatus;
+    protected $acceptedGuestsStatus;
 
-	public function __construct($acceptedGuestsStatus = false)
-	{
-		$this->setAcceptedGuestsStatus($acceptedGuestsStatus);
-	}
+    public function __construct($acceptedGuestsStatus = false)
+    {
+        $this->setAcceptedGuestsStatus($acceptedGuestsStatus);
+    }
 
-	/**
+    /**
 	 * @param boolean $acceptedGuestsStatus
 	 */
-	public function setAcceptedGuestsStatus($acceptedGuestsStatus)
-	{
-		$this->acceptedGuestsStatus = (bool) $acceptedGuestsStatus;
-		return $this;
-	}
+    public function setAcceptedGuestsStatus($acceptedGuestsStatus)
+    {
+        $this->acceptedGuestsStatus = (bool) $acceptedGuestsStatus;
 
-	/**
+        return $this;
+    }
+
+    /**
 	 * @SuppressWarnings(PHPMD.BooleanGetMethodName)
 	 * @return boolean
 	 */
-	public function getAcceptedGuestsStatus()
-	{
-		return $this->acceptedGuestsStatus;
-	}
+    public function getAcceptedGuestsStatus()
+    {
+        return $this->acceptedGuestsStatus;
+    }
 
-	/**
+    /**
 	 * {@inheritdoc}
 	 */
-	public function matchItem(ItemInterface $item)
-	{
-		if ($item->getType() != 'content') {
-			return true;
-		}
+    public function matchItem(ItemInterface $item)
+    {
+        if ($item->getType() != 'content') {
+            return true;
+        }
 
-		$guests = $item->getExtra('guests');
-		return $guests == $this->acceptedGuestsStatus;
-	}
+        $guests = $item->getExtra('guests');
 
-	/**
+        return $guests == $this->acceptedGuestsStatus;
+    }
+
+    /**
 	 * {@inheritdoc}
 	 */
-	public function describe()
-	{
-		return $this->acceptedGuestsStatus ? 'content.guestsOnly' : '!content.guestsOnly';
-	}
+    public function describe()
+    {
+        return $this->acceptedGuestsStatus ? 'content.guestsOnly' : '!content.guestsOnly';
+    }
 }
